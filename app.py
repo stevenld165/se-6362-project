@@ -15,6 +15,47 @@ current_shifts = []
 HTML = """
 <!doctype html>
 <title>KWIC Demo</title>
+<style>
+html {
+    font-family: sans-serif;
+}
+
+body {
+    padding: 0 2rem;
+    width: 100%;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.group {
+    margin-bottom: 1rem;
+}
+
+.groups {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.shifts {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+#circular-shifts {
+    flex: 1
+}
+
+#alphabetized-shifts {
+    flex: 1
+}
+
+
+</style>
 <h2>KWIC</h2>
 <form method="post" action="/input">
   <textarea name="text" rows="6" cols="50"></textarea><br>
@@ -40,23 +81,29 @@ HTML = """
     <p style="color: {{ colors[loop.index0 % colors|length] }}">{{ line }}</p>
 {% endfor %}
 </div>
+<hr>
 
-<h3>Circular Shifts:</h3>
-<div>
-{% for line_group in shifts %}
-    <div style="color: {{ colors[loop.index0 % colors|length] }}">
-        {% for shift in line_group %}
-            <p>{{ shift }}</p>
-        {% endfor %}
+<div class="shifts">
+<div id="circular-shifts">
+    <h3>Circular Shifts:</h3>
+    <div class="groups">
+    {% for line_group in shifts %}
+        <div class="group" style="color: {{ colors[loop.index0 % colors|length] }}">
+            {% for shift in line_group %}
+                <p>{{ shift }}</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
     </div>
-{% endfor %}
 </div>
-
-<h3>Alphabetized Shifts:</h3>
-<div>
-{% for alphabetized_shift in alphabetized_shifts %}
-    <p>{{ alphabetized_shift }}</p>
-{% endfor %}
+<div id="alphabetized-shifts">
+    <h3>Alphabetized Shifts:</h3>
+    <div>
+    {% for alphabetized_shift in alphabetized_shifts %}
+        <p>{{ alphabetized_shift }}</p>
+    {% endfor %}
+    </div>
+</div>
 </div>
 """
 
