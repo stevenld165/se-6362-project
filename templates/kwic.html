@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<title>KWIC Demo</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap");
+
+  html {
+    font-family: "IBM Plex Sans", sans-serif;
+  }
+
+  body {
+    padding: 0 2rem;
+    background-color: #171717;
+    color: #f2f2f2;
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  button {
+    font-family: "IBM Plex Sans", sans-serif;
+    background-color: #2d2d2d;
+    color: #f2f2f2;
+    padding: 0.25rem 0.75rem;
+    border: none;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease-in-out;
+  }
+
+  button:hover {
+    background-color: #434343;
+    cursor: pointer;
+  }
+
+  textarea {
+    background-color: #171717;
+    color: #f2f2f2;
+    border-radius: 0.25rem;
+  }
+
+  h3 {
+    margin-top: 0;
+  }
+
+  .container {
+    background-color: #242424;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+  }
+
+  #main-input {
+    display: flex;
+    gap: 1rem;
+    max-width: fit-content;
+  }
+
+  #main-input-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  #main-input-buttons button {
+    width: 100%;
+  }
+
+  .group {
+    margin-bottom: 1rem;
+  }
+
+  .groups {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .shifts {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  #circular-shifts {
+    flex: 1;
+  }
+
+  #alphabetized-shifts {
+    flex: 1;
+  }
+</style>
+<h2>KWIC</h2>
+<div class="container" id="main-input">
+  <form method="post" action="/input">
+    <textarea name="text" rows="6" cols="50"></textarea><br />
+    <button type="submit">Store Input</button>
+  </form>
+
+  <div id="main-input-buttons">
+    <form method="post" action="/shift">
+      <button type="submit">Generate Shifts for Next Line</button>
+    </form>
+
+    <form method="post" action="/alphabetize">
+      <button type="submit">Alphabetize All Shifts</button>
+    </form>
+
+    <form method="post" action="/input">
+      <input name="text" value="" hidden />
+      <button type="submit">Reset</button>
+    </form>
+  </div>
+</div>
+
+{% set colors = ["#9AE630", "#21BCFF", "#FF637E", "#C27AFF", "#FDC745",
+"#FF8904", "#ED6AFF"] %}
+
+<div class="container">
+  <h3>Line Storage</h3>
+  {% for line in lines %}
+  <p style="color: {{ colors[loop.index0 % colors|length] }}">{{ line }}</p>
+  {% endfor %}
+</div>
+
+<div class="shifts container">
+  <div id="circular-shifts">
+    <h3>Circular Shifts</h3>
+    <div class="groups">
+      {% for line_group in shifts %}
+      <div
+        class="group"
+        style="color: {{ colors[loop.index0 % colors|length] }}"
+      >
+        {% for shift in line_group %}
+        <p>{{ shift }}</p>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div id="alphabetized-shifts">
+    <h3>Alphabetized Shifts</h3>
+    <div>
+      {% for alphabetized_shift in alphabetized_shifts %}
+      <p>{{ alphabetized_shift }}</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template_string, render_template
 
 from kwic.Alphabetizer import Alphabetizer
 from kwic.CircularShift import CircularShift
@@ -109,8 +109,8 @@ p {
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template_string(
-        HTML,
+    return render_template(
+        "kwic.html",
         lines=storage.get_all(),
         shifts=current_shifts,
         alphabetized_shifts=alphabetizer.get_all()
