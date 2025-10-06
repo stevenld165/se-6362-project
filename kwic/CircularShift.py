@@ -1,5 +1,7 @@
 from kwic import LineStorage
 
+FILLER_WORDS = ['a', 'the', 'is', 'in', 'on', 'and', 'to']
+
 # Circular shifts must be done incrementally for each line.
 # perhaps update this to use a hashmap of some sort to store the line information if needed
 # also potentially update to be case insensitive
@@ -17,9 +19,10 @@ class CircularShift:
         line_shifts = []
         for i in range(len(words)):
             # add logic for cutting shifts beginning with filler words here :)
-            shifted = words[i:] + words[:i]
-            line_shifts.append(shifted)
-            self.shifts.append(shifted)
+            if (words[i].lower() not in FILLER_WORDS):
+                shifted = words[i:] + words[:i]
+                line_shifts.append(shifted)
+                self.shifts.append(shifted)
             
         self.current_line_index += 1
         return [" ".join(shift) for shift in line_shifts]
