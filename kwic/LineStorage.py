@@ -5,7 +5,7 @@ class LineStorage:
     def __init__(self):
         self.lines = []
     def set_lines(self, text):
-        self.lines = [line.strip().split() for line in text.splitlines() if line.strip()]
+        self.lines += [line.strip().split() for line in text.splitlines() if line.strip()]
     def get_line(self, index):
         return self.lines[index]
     def get_all(self):
