@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <title>KWIC Demo</title>
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap");
+  @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap");
 
   html {
     font-family: "IBM Plex Sans", sans-serif;
@@ -67,6 +67,10 @@
     width: 100%;
   }
 
+  .line-storage {
+    font-family: "IBM Plex Mono", monospace;
+  }
+
   .group {
     margin-bottom: 1rem;
   }
@@ -75,6 +79,7 @@
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+    font-family: "IBM Plex Mono", monospace;
   }
 
   .shifts {
@@ -90,6 +95,10 @@
   #alphabetized-shifts {
     flex: 1;
   }
+
+  .alphabetized-shifts {
+    font-family: "IBM Plex Mono", monospace;
+  }
 </style>
 <h2>KWIC</h2>
 <div class="container" id="main-input">
@@ -103,11 +112,13 @@
       <button type="submit">Generate Shifts for Next Line</button>
     </form>
 
+    <!--
     <form method="post" action="/alphabetize">
       <button type="submit">Alphabetize All Shifts</button>
     </form>
+    -->
 
-    <form method="post" action="/input">
+    <form method="post" action="/reset">
       <input name="text" value="" hidden />
       <button type="submit">Reset</button>
     </form>
@@ -119,22 +130,24 @@
 
 <div class="container">
   <h3>Line Storage</h3>
-  {% for line in lines %}
-  <p style="color: {{ colors[loop.index0 % colors|length] }}">{{ line }}</p>
-  {% endfor %}
+  <div class="line-storage">
+    {% for line in lines %}
+    <p style="color: {{ colors[loop.index0 % colors|length] }}">{{ line }}</p>
+    {% endfor %}
+  </div>
 </div>
 
 <div class="shifts container">
   <div id="circular-shifts">
     <h3>Circular Shifts</h3>
     <div class="groups">
-      {% for line_group in shifts %}
+      {% for line_group in shifts.keys() %}
       <div
         class="group"
         style="color: {{ colors[loop.index0 % colors|length] }}"
       >
-        {% for shift in line_group %}
-        <p>{{ shift }}</p>
+        {% for shift in shifts[line_group] %}
+        <p>{{ " ".join(shift) }}</p>
         {% endfor %}
       </div>
       {% endfor %}
@@ -142,7 +155,7 @@
   </div>
   <div id="alphabetized-shifts">
     <h3>Alphabetized Shifts</h3>
-    <div>
+    <div class="alphabetized-shifts">
       {% for alphabetized_shift in alphabetized_shifts %}
       <p>{{ alphabetized_shift }}</p>
       {% endfor %}
