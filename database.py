@@ -1,4 +1,5 @@
 from typing import List
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase
@@ -11,7 +12,9 @@ from sqlalchemy import create_engine
 class Base(DeclarativeBase):
     pass
 
-class Website(Base):
+db = SQLAlchemy(model_class=Base)
+
+class Website(db.Model):
     __tablename__ = "website"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -20,12 +23,12 @@ class Website(Base):
     accesses: Mapped[int]
     sponsorMoney: Mapped[float]
 
-    kwic_entries: Mapped[List["KwicEntry"]] = relationship(back_populates="website")
+    kwic_entries: Mapped[List["KwicEntry"]] = relationship(back_populates="website", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"Website(id={self.id!r}, url={self.url!r}, desc={self.desc!r}, accesses={self.accesses!r}, sponsorMoney={self.sponsorMoney!r})"
 
-class KwicEntry(Base):
+class KwicEntry(db.Model):
     __tablename__ = "kwic"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -38,6 +41,6 @@ class KwicEntry(Base):
     def __repr__(self) -> str:
         return f"KwicEntry(id={self.id!r}, website={self.website!r}, first_word={self.first_word!r}, full_circular_shift={self.full_circular_shift!r})"
 
-engine = create_engine("sqlite://", echo=True)
+# engine = create_engine("sqlite://", echo=True)
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)

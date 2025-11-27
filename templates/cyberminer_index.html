@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<head>
+  <title>Cyberminer</title>
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="{{ url_for('static',filename='main.css') }}"
+  />
+</head>
+<body>
+  <nav>
+    <a class="active-page">cyberminer</a>
+    <a>admin dashboard</a>
+  </nav>
+  <div>
+    <h1>Cyberminer</h1>
+    <form method="post" action="/search/1">
+      <div>
+        <div>
+          <input
+            type="text"
+            name="keywords"
+            placeholder="enter keywords..."
+            value="{{ search_text }}"
+          />
+          <button type="submit">search</button>
+        </div>
+        <div>
+          <input type="radio" id="or-option" name="keyword-mode" value="OR" {%if
+          keyword_mode == "OR" %} checked {% endif %}/>
+          <label for="or-option">OR</label>
+          <input type="radio" id="and-option" name="keyword-mode" value="AND"
+          {%if keyword_mode == "AND" %} checked {% endif %}/>
+          <label for="and-option">AND</label>
+          <input type="radio" id="not-option" name="keyword-mode" value="NOT"
+          {%if keyword_mode == "NOT" %} checked {% endif %}/>
+          <label for="not-option">NOT</label>
+        </div>
+      </div>
+      <div>
+        <input type="radio" id="sort-url" name="sort-mode" value="url" {%if
+        sort_mode == "url" %} checked {% endif %}/>
+        <label for="sort-url">asc. alphabetical</label>
+        <input type="radio" id="sort-accesses" name="sort-mode" value="accesses"
+        {% if sort_mode == "accesses" %} checked {% endif %} />
+        <label for="sort-accesses">frequently accessed</label>
+        <input type="radio" id="sort-sponsorMoney" name="sort-mode"
+        value="sponsorMoney" {% if sort_mode == "sponsorMoney" %} checked {%
+        endif %} />
+        <label for="sort-sponsorMoney">per payment</label>
+      </div>
+
+      <div>
+        <div>
+          {% for result in results %}
+          <div onclick="visitWebsite('{{ result[0].id }}')">
+            <h6>{{ result[0].url }}</h6>
+            <p>{{ result[0].desc }}</p>
+          </div>
+          <div>
+            <p>accessed <span>{{ result[0].accesses }}</span> times</p>
+            <p>sponsor money: <span>${{ result[0].sponsorMoney }}</span></p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <div>
+          <button
+            type="submit"
+            formaction="/search/{{ page_num - 1 if page_num - 1 > 1 else 1 }}"
+          >
+            prev
+          </button>
+          <p>pg {{ page_num }}/12</p>
+          <button
+            type="submit"
+            formaction="/search/{{ page_num + 1 if results|length > 0 else page_num }}"
+          >
+            next
+          </button>
+        </div>
+        <p>
+          show
+          <select name="items-per-page" id="items-per-page">
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+          </select>
+          per page
+        </p>
+      </div>
+    </form>
+  </div>
+  <script>
+    document.getElementById("items-per-page").value = "{{ items_per_page }}";
+
+    function visitWebsite(websiteId) {
+      console.log("visit");
+      const data = {
+        websiteId: websiteId,
+      };
+
+      fetch("/visit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          window.open(data.url, "_blank");
+        });
+    }
+  </script>
+</body>

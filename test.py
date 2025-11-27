@@ -222,7 +222,7 @@ cyberminer.add_website("https://www.callofduty.com", "Call of Duty is a first-pe
 cyberminer.add_website("https://www.overwatch.com", "Overwatch is a team-based multiplayer first-person shooter featuring diverse heroes with unique abilities and roles.")
 cyberminer.add_website("https://www.valorant.com", "Valorant is a free-to-play tactical first-person shooter combining precise gunplay with unique character abilities.")
 
-results = cyberminer.search(["youtube", "minecraft", "steven", "roblox", "fortnite", "gaming", "apartments", "airplane"], "OR", "url")
+results = cyberminer.search(["youtube", "minecraft", "steven", "roblox", "fortnite", "gaming", "apartments", "airplane"], "OR", "url", 1)
 
 for result in results:
     print(result[0])
