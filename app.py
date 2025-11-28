@@ -31,7 +31,7 @@ def index():
         results=[],
         keyword_mode="OR",
         sort_mode="url",
-        page_num=1,
+        page_num=0,
         items_per_page="5",
     )
 

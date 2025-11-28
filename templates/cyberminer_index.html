@@ -79,7 +79,7 @@
           </div>
           {% endfor %}
         </div>
-        <div id="search-navigation">
+        <div id="search-navigation" {% if page_num == 0 %} style="visibility: hidden;" {% endif %}>
           <div id="page-buttons">
             <button
               type="submit"
@@ -107,6 +107,7 @@
             per page
           </p>
         </div>
+        
       </div>
       
     </form>
