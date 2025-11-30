@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<head>
+  <title>Cyberminer</title>
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="{{ url_for('static',filename='main.css') }}"
+  />
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="{{ url_for('static',filename='admin-dashboard.css') }}"
+  />
+</head>
+<body>
+  <nav>
+    <a href="/">cyberminer</a>
+    <a href="/admin" class="active-page">admin dashboard</a>
+  </nav>
+  <div id="admin-main-container">
+    <div id="input-website-form">
+      <form method="post" action="/add-new-website">
+        <label>
+          url
+          <input type="text" name="url" />
+        </label>
+        <label>
+          description
+          <input type="text" name="desc" />
+        </label>
+        <label>
+          sponsor money ($)
+          <input type="number" name="sponsorMoney" />
+        </label>
+        <button type="submit">add website</button>
+      </form>
+      {% if added_website %}
+      <p>Successfully added new website: {{ added_website.url }}</p>
+      {% endif %}
+    </div>
+    <div id="kwic-list">
+      <h4>KWIC Index Entries</h4>
+      {% for entry in kwic_entries %}
+
+      <div class="kwic-entry">
+        {% set kwic = entry[0] %}
+        <p>{{ kwic.full_circular_shift }}</p>
+        <strong>{{ kwic.website.url }}</strong>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</body>

@@ -11,14 +11,14 @@ class Cyberminer:
     def __init__(self):
         self.kwic = Kwic()
     # add website
-    def add_website(self, url: str, desc: str):
+    def add_website(self, url: str, desc: str, sponsor_money: float = 0):
         shifts = self.kwic.addWebsite(desc)
 
         website = Website(
             url = url,
             desc = desc,
             accesses = 0,
-            sponsorMoney = 0
+            sponsorMoney = sponsor_money
         )
 
         db.session.add(website)
@@ -28,6 +28,7 @@ class Cyberminer:
             kwic_entry = KwicEntry(
                 website_id = website.id,
                 first_word = shift["first_word"],
+                first_word_filtered = ''.join(char for char in shift["first_word"] if char.isalnum()),
                 full_circular_shift = shift["full_circular_shift"]
             )
 
@@ -35,7 +36,7 @@ class Cyberminer:
         
         db.session.commit()
 
-        print("added")
+        return(website)
     # remove website
     def remove_website(self, website_id: int):
         website = db.session.get(Website, website_id)
@@ -43,33 +44,36 @@ class Cyberminer:
         db.session.commit
 
         print(f"Deleted: {website}")
-    def search(self, keywords, mode, sort_order, page_num=1, items_per_page=5):
+    def search(self, keywords, mode, sort_order, page_num=1, items_per_page=5, filter_special_characters=False):
         # assume or mode first
         print("searching!")
 
         stmt = None
 
+        def main_filter(keyword):
+            return KwicEntry.first_word_filtered.op("GLOB")(keyword + "*") if filter_special_characters else KwicEntry.first_word.op("GLOB")(keyword + "*")
+
         match mode:
             case "OR":
                 stmt = select(Website).join(Website.kwic_entries).where(
-                    or_(*[KwicEntry.first_word.like(keyword + "%") for keyword in keywords])
+                    or_(*[main_filter(keyword) for keyword in keywords])
                 ).distinct()
             case "AND":
                 stmt = select(Website).join(Website.kwic_entries)
 
                 for keyword in keywords:
                     stmt = stmt.where(
-                        Website.kwic_entries.any(KwicEntry.first_word.like(keyword + "%"))
+                        Website.kwic_entries.any(main_filter(keyword))
                     )
 
                 stmt = stmt.distinct()
             case "NOT":
                 stmt = select(Website).join(Website.kwic_entries).where(
-                    or_(*[~Website.kwic_entries.any(KwicEntry.first_word.like(keyword + "%")) for keyword in keywords])
+                    or_(*[~Website.kwic_entries.any(main_filter(keyword)) for keyword in keywords])
                 ).distinct()
             case _:
                 stmt = select(Website).join(Website.kwic_entries).where(
-                    or_(*[KwicEntry.first_word.like(keyword + "%") for keyword in keywords])
+                    or_(*[main_filter(keyword) for keyword in keywords])
                 ).distinct()
         
 
@@ -107,8 +111,16 @@ class Cyberminer:
         website = db.session.get(Website, website_id)
         website.sponsorMoney += incrementAmount
         db.session.commit()
-        return    
+        return 
+    def getAllKwic(self):
+        stmt = select(KwicEntry).join(KwicEntry.website).order_by(KwicEntry.first_word)
+        result = db.session.execute(stmt).all()
+        return result
     def seed(self):
+        if (len(db.session.execute(select(Website)).all()) != 0 ): 
+            return
+        
+        print("SEEDING")
         self.add_website("https://www.wikipedia.com/", "Wikipedia is an extensive online encyclopedia curated and created by the work of a massive group of contributers.")
         self.add_website("https://www.youtube.com", "Youtube is a platform for sharing videos with other users. Currently the most popular video sharing website on the internet.")
         self.add_website("https://www.github.com", "Github is a proprietary developer platform that allows developers to create, store, manage, and share their code.")
@@ -303,3 +315,4 @@ class Cyberminer:
         self.add_website("https://www.callofduty.com", "Call of Duty is a first-person shooter franchise offering fast-paced multiplayer, battle royale, and campaign experiences.")
         self.add_website("https://www.overwatch.com", "Overwatch is a team-based multiplayer first-person shooter featuring diverse heroes with unique abilities and roles.")
         self.add_website("https://www.valorant.com", "Valorant is a free-to-play tactical first-person shooter combining precise gunplay with unique character abilities.")
+        print("DONE SEEDING")

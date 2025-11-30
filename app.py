@@ -24,6 +24,9 @@ current_shifts = [] # this should be refactored to no longer use this i think th
 # Cyberminer new code
 cyberminer = Cyberminer()
 
+# with app.app_context():
+#     cyberminer.seed()
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template(
@@ -33,6 +36,7 @@ def index():
         sort_mode="url",
         page_num=0,
         items_per_page="5",
+        filter_special_chars=None
     )
 
 @app.route("/search/<int:page_num>", methods=["POST"])
@@ -43,7 +47,9 @@ def input_text(page_num=1):
 
     items_per_page = request.form["items-per-page"]
 
-    results = cyberminer.search(keywords, keyword_mode, sort_mode, page_num, int(items_per_page))
+    filter_special_chars = request.form.get("filter-special-chars")
+
+    results = cyberminer.search(keywords, keyword_mode, sort_mode, page_num, int(items_per_page), True if filter_special_chars else False)
 
     return render_template(
         "cyberminer_index.html",
@@ -52,7 +58,8 @@ def input_text(page_num=1):
         keyword_mode=keyword_mode,
         sort_mode=sort_mode,
         page_num=page_num,
-        items_per_page=items_per_page
+        items_per_page=items_per_page,
+        filter_special_chars=filter_special_chars
     )
 
 @app.route("/visit", methods=["POST"])
@@ -60,6 +67,24 @@ def visit_website():
     data = request.json
     return {"url": cyberminer.visit(data["websiteId"])}
 
+@app.route("/admin", methods=["GET"])
+def admin(website=None):
+    kwic_entries = cyberminer.getAllKwic()
+    return render_template(
+        "cyberminer_admin.html",
+        kwic_entries = kwic_entries,
+        added_website = website
+    )
+
+@app.route("/add-new-website", methods=["POST"])
+def add_new_website():
+    url = request.form["url"]
+    desc = request.form["desc"]
+    sponsor_money = float(request.form["sponsorMoney"])
+
+    website = cyberminer.add_website(url, desc, sponsor_money)
+
+    return admin(website)
 
 # @app.route("/", methods=["GET"])
 # def index():

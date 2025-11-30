@@ -9,8 +9,8 @@
 </head>
 <body>
   <nav>
-    <a class="active-page">cyberminer</a>
-    <a>admin dashboard</a>
+    <a href="/" class="active-page">cyberminer</a>
+    <a href="/admin">admin dashboard</a>
   </nav>
   <div>
     <form method="post" action="/search/1">
@@ -43,6 +43,11 @@
                 <input type="radio" id="not-option" name="keyword-mode" value="NOT"
                 {%if keyword_mode == "NOT" %} checked {% endif %}/>
                 <label for="not-option">NOT</label>
+              </span>
+              <span>
+                <input type="checkbox" id="filter-special-chars" name="filter-special-chars"
+                {%if filter_special_chars %} checked {% endif %}/>
+                <label for="filter-special-chars">filter special chars</label>
               </span>
             </div>
           </div>
