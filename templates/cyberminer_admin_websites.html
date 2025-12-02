@@ -34,21 +34,27 @@
         </label>
         <button type="submit">add website</button>
       </form>
-      {% if added_website %}
+      {% if added_website %} {% if removed %}
+      <p>Successfully removed website: {{ added_website.url }}</p>
+      {% else %}
       <p>Successfully added new website: {{ added_website.url }}</p>
-      {% endif %}
+      {% endif %} {% endif %}
     </div>
     <div id="kwic-list">
       <div>
-        <button disabled>KWIC Index Entries</button>
-        <a href="/admin/websites"><button>Website List</button></a>
+        <a href="/admin"><button>KWIC Index Entries</button></a>
+        <a><button disabled>Website List</button></a>
       </div>
-      {% for entry in kwic_entries %}
+      {% for entry in websites %}
 
       <div class="kwic-entry">
-        {% set kwic = entry[0] %}
-        <p>{{ kwic.full_circular_shift }}</p>
-        <strong>{{ kwic.website.url }}</strong>
+        {% set website = entry[0] %}
+        <p>{{ website.desc }}</p>
+        <strong>{{ website.url }}</strong>
+        <form method="post" action="/admin/delete">
+          <input type="hidden" name="website-id" value="{{ website.id }}" />
+          <button type="submit">delete</button>
+        </form>
       </div>
       {% endfor %}
     </div>

@@ -40,10 +40,12 @@ class Cyberminer:
     # remove website
     def remove_website(self, website_id: int):
         website = db.session.get(Website, website_id)
-        db.session.delete(website)
-        db.session.commit
+        
+        if website:
+            db.session.delete(website)
+            db.session.commit()
 
-        print(f"Deleted: {website}")
+        return website
     def search(self, keywords, mode, sort_order, page_num=1, items_per_page=5, filter_special_characters=False):
         # assume or mode first
         print("searching!")
@@ -51,7 +53,8 @@ class Cyberminer:
         stmt = None
 
         def main_filter(keyword):
-            return KwicEntry.first_word_filtered.op("GLOB")(keyword + "*") if filter_special_characters else KwicEntry.first_word.op("GLOB")(keyword + "*")
+            filtered_keyword = ''.join(char for char in keyword if char.isalnum())
+            return KwicEntry.first_word_filtered.op("GLOB")(filtered_keyword + "*") if filter_special_characters else KwicEntry.first_word.op("GLOB")(keyword + "*")
 
         match mode:
             case "OR":
@@ -114,6 +117,10 @@ class Cyberminer:
         return 
     def getAllKwic(self):
         stmt = select(KwicEntry).join(KwicEntry.website).order_by(KwicEntry.first_word)
+        result = db.session.execute(stmt).all()
+        return result
+    def getAllWebsites(self):
+        stmt = Select(Website).order_by(Website.url)
         result = db.session.execute(stmt).all()
         return result
     def seed(self):

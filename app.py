@@ -24,8 +24,8 @@ current_shifts = [] # this should be refactored to no longer use this i think th
 # Cyberminer new code
 cyberminer = Cyberminer()
 
-# with app.app_context():
-#     cyberminer.seed()
+with app.app_context():
+    cyberminer.seed()
 
 @app.route("/", methods=["GET"])
 def index():
@@ -76,6 +76,17 @@ def admin(website=None):
         added_website = website
     )
 
+@app.route("/admin/websites", methods=["GET"])
+def admin_websites(website=None, removed=False):
+    websites = cyberminer.getAllWebsites()
+
+    return render_template(
+        "cyberminer_admin_websites.html",
+        websites = websites,
+        added_website = website,
+        removed = removed
+    )
+
 @app.route("/add-new-website", methods=["POST"])
 def add_new_website():
     url = request.form["url"]
@@ -84,7 +95,15 @@ def add_new_website():
 
     website = cyberminer.add_website(url, desc, sponsor_money)
 
-    return admin(website)
+    return admin_websites(website)
+
+@app.route("/admin/delete", methods=["POST"])
+def remove_website():
+    website_id = int(request.form["website-id"])
+    website = cyberminer.remove_website(website_id)
+
+    return admin_websites(website, removed=True)
+
 
 # @app.route("/", methods=["GET"])
 # def index():
